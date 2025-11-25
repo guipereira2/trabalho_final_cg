@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>MiniGolf 3D – Rampa (Estilo Diagrama)</title>
+  <style>
+    body {
+      margin: 0;
+      background: #dddddd; /* cinza de fora do quadro */
+      color: #000;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100vh;
+    }
+    h1 {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+    #canvas-wrapper {
+      margin-top: 10px;
+      padding: 8px;
+      background: #f0f0f0;           /* “quadro” mais claro */
+      border: 2px solid #000;        /* borda preta como na figura */
+      box-sizing: content-box;
+    }
+    #glcanvas {
+      display: block;
+      background: transparent;       /* o WebGL fica transparente, o “quadro” é a div */
+    }
+  </style>
+</head>
+<body>
+  <h1>Diagraminha da Rampa – Minigolfe 3D</h1>
+
+  <div id="canvas-wrapper">
+    <canvas id="glcanvas" width="600" height="300"></canvas>
+  </div>
+
+  <script type="module" src="js/rampaMain.js"></script>
+</body>
+</html>

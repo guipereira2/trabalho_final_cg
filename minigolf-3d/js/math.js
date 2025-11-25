@@ -1,4 +1,4 @@
-// math.js
+// js/math.js
 
 export function mat4Identity() {
   return [
