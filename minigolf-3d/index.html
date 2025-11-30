@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>MiniGolf 3D WebGL</title>
+  <style>
+    :root {
+      --bg: #101820;
+      --accent: #27c4a8;
+      --accent-soft: #27c4a855;
+      --text: #f5f5f5;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(circle at top, #1c78ff 0, #101820 55%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      margin-top: 14px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    header p {
+      margin: 4px 0 0;
+      font-size: 0.9rem;
+      opacity: 0.85;
+    }
+
+    main {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #glcanvas {
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: #4ab6ff;
+      max-width: 100%;
+    }
+
+    .hud {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+      max-width: 700px;
+    }
+
+    .hud-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+
+    .hud-label {
+      opacity: 0.8;
+    }
+
+    .hud-value {
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .power-bar {
+      position: relative;
+      width: 180px;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+    }
+
+    .power-fill {
+      position: absolute;
+      inset: 0;
+      width: 0%;
+      background: linear-gradient(90deg, #27c4a8, #ffd55a);
+      box-shadow: 0 0 10px var(--accent-soft);
+      transition: width 0.05s linear;
+    }
+
+    .help {
+      font-size: 0.8rem;
+      opacity: 0.8;
+      text-align: center;
+      margin-top: 2px;
+    }
+
+    .message {
+      margin-top: 8px;
+      min-height: 1.2em;
+      font-weight: 500;
+      text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MiniGolf 3D WebGL</h1>
+    <p>Use A / D para mirar &nbsp;&middot;&nbsp; Segure espaço para carregar a tacada</p>
+  </header>
+
+  <main>
+    <canvas id="glcanvas" width="960" height="540"></canvas>
+
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-label">Tacadas:</span>
+        <span class="hud-value" id="strokesValue">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Força:</span>
+        <div class="power-bar">
+          <div class="power-fill" id="powerFill"></div>
+        </div>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Par:</span>
+        <span class="hud-value">3</span>
+      </div>
+    </div>
+
+    <div class="help">
+      A / ← / → para girar a mira &nbsp;&middot;&nbsp; Segure Espaço para carregar &nbsp;&middot;&nbsp; Solte para bater
+    </div>
+    <div class="message" id="gameMessage"></div>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

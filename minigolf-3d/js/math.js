@@ -41,21 +41,18 @@ export function mat4LookAt(eye, center, up) {
   const [cx, cy, cz] = center;
   const [ux, uy, uz] = up;
 
-  // f = normalize(center - eye)
   let fx = cx - ex;
   let fy = cy - ey;
   let fz = cz - ez;
   const flen = Math.hypot(fx, fy, fz);
   fx /= flen; fy /= flen; fz /= flen;
 
-  // s = normalize(cross(f, up))
   let sx = fy * uz - fz * uy;
   let sy = fz * ux - fx * uz;
   let sz = fx * uy - fy * ux;
   const slen = Math.hypot(sx, sy, sz);
   sx /= slen; sy /= slen; sz /= slen;
 
-  // u' = cross(s, f)
   const ux2 = sy * fz - sz * fy;
   const uy2 = sz * fx - sx * fz;
   const uz2 = sx * fy - sy * fx;
@@ -65,10 +62,29 @@ export function mat4LookAt(eye, center, up) {
   out[1] = ux2; out[5] = uy2; out[9]  = uz2;
   out[2] = -fx; out[6] = -fy; out[10] = -fz;
 
-  // translação
   out[12] = -(sx * ex + sy * ey + sz * ez);
   out[13] = -(ux2 * ex + uy2 * ey + uz2 * ez);
   out[14] =  (fx * ex + fy * ey + fz * ez);
 
   return out;
+}
+
+export function mat4Translation(tx, ty, tz) {
+  return [
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    tx, ty, tz, 1
+  ];
+}
+
+export function mat4RotationY(angle) {
+  const c = Math.cos(angle);
+  const s = Math.sin(angle);
+  return [
+    c, 0, s, 0,
+    0, 1, 0, 0,
+   -s, 0, c, 0,
+    0, 0, 0, 1
+  ];
 }
