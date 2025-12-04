@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Golf 3D - WebGL</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="glCanvas"></canvas>
+        
+        <div id="hud">
+            <div class="hud-item">
+                <span class="hud-label">Tacadas:</span>
+                <span id="strokes">0</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">Par:</span>
+                <span id="par">3</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">Melhor:</span>
+                <span id="best">-</span>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">Força:</span>
+                <div id="power-bar">
+                    <div id="power-fill"></div>
+                </div>
+            </div>
+            <div class="hud-item">
+                <span class="hud-label">Câmera:</span>
+                <span id="camera-mode">Aérea</span>
+            </div>
+        </div>
+        
+        <div id="controls">
+            <p><strong>Controles:</strong></p>
+            <p>🎯 <strong>Mira Estilingue:</strong> Clique e arraste para trás da bola</p>
+            <p>🖱️ Botão direito: Câmera livre</p>
+            <p>C: Trocar câmera (Aérea/Trás da bola/Livre)</p>
+            <p>Espaço: Resetar bola (penalidade)</p>
+            <p><em>Quanto mais longe arrastar, mais forte o tiro!</em></p>
+        </div>
+        
+        <div id="game-over" style="display: none;">
+            <h2>🎉 Parabéns!</h2>
+            <p>Você completou a fase!</p>
+            <p>Total de tacadas: <span id="final-strokes"></span></p>
+            <p>Par esperado: <span id="final-par"></span></p>
+            <button id="restart-btn">Jogar Novamente</button>
+        </div>
+    </div>
+
+    <!-- Biblioteca matemática própria (WebGL puro - sem bibliotecas externas) -->
+    <script src="js/math.js?v=2"></script>
+    
+    <!-- Game scripts -->
+    <script src="js/glutils.js?v=2"></script>
+    <script src="js/camera.js?v=2"></script>
+    <script src="js/physics.js?v=2"></script>
+    <script src="js/golfBall.js?v=2"></script>
+    <script src="js/flag.js?v=2"></script>
+    <script src="js/hud.js?v=2"></script>
+    <script src="js/main.js?v=2"></script>
+</body>
+</html>
