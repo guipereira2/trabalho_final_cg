@@ -7,29 +7,36 @@ class Flag {
     update(deltaTime) {
         this.time += deltaTime;
     }
-    
-    getModelMatrix() {
-        const modelMatrix = mat4.create();
-        mat4.translate(modelMatrix, modelMatrix, this.position);
-        return modelMatrix;
-    }
-    
+
     getPoleMatrix() {
         const modelMatrix = mat4.create();
+        
+        // Mastro sai do buraco
         mat4.translate(modelMatrix, modelMatrix, this.position);
-        mat4.translate(modelMatrix, modelMatrix, [0, 2, 0]);
-        mat4.scale(modelMatrix, modelMatrix, [0.05, 2, 0.05]);
+        mat4.translate(modelMatrix, modelMatrix, [0, 1.5, 0]); // altura média
+        mat4.scale(modelMatrix, modelMatrix, [0.04, 1.5, 0.04]); // fininho
+        
         return modelMatrix;
     }
-    
+
     getFlagMatrix() {
         const modelMatrix = mat4.create();
+        
+        // Bandeira no topo do mastro
         mat4.translate(modelMatrix, modelMatrix, this.position);
-        mat4.translate(modelMatrix, modelMatrix, [0.5, 3.5, 0]);
-        mat4.scale(modelMatrix, modelMatrix, [1, 0.6, 0.1]);
+        mat4.translate(modelMatrix, modelMatrix, [0, 2.8, 0]); // topo
+        
+        // Pequeno offset para o lado + leve ondulação
+        const wave = Math.sin(this.time * 2) * 0.05;
+        mat4.translate(modelMatrix, modelMatrix, [0.35 + wave, 0, 0]);
+        
+        // Bandeira triangular/retangular simples
+        mat4.scale(modelMatrix, modelMatrix, [0.6, 0.3, 0.05]);
+        
         return modelMatrix;
     }
 }
+
 
 // Criar cachorro (mascote/caddie)
 class Dog {

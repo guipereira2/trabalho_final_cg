@@ -43,8 +43,8 @@ class GolfBall {
         const dy = mouseY - this.mouseStartPos.y;
         
         // Calcular ângulo (direção oposta ao arrasto)
-        this.aimAngle = Math.atan2(dx, dy) + Math.PI;
-        
+        this.aimAngle = Math.atan2(-dx, dy) + Math.PI;
+
         // Calcular força baseada na distância
         const distance = Math.sqrt(dx * dx + dy * dy);
         this.aimPower = Math.min(distance / 3, 100);
@@ -55,12 +55,12 @@ class GolfBall {
     }
     
     updateAimDirection() {
-        this.aimDirection[0] = Math.sin(this.aimAngle);
-        this.aimDirection[1] = 0;
-        this.aimDirection[2] = Math.cos(this.aimAngle);
-        vec3.normalize(this.aimDirection, this.aimDirection);
-    }
-    
+    this.aimDirection[0] = Math.sin(this.aimAngle);
+    this.aimDirection[1] = 0;
+    this.aimDirection[2] = Math.cos(this.aimAngle);
+    vec3.normalize(this.aimDirection, this.aimDirection);
+}
+
     rotateAim(delta) {
         this.aimAngle += delta;
         this.updateAimDirection();

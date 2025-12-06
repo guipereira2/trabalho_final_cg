@@ -14,6 +14,32 @@ function createShader(gl, type, source) {
     return shader;
 }
 
+function createDisc(radius, segments) {
+    const positions = [];
+    const normals = [];
+    const texCoords = [];
+    const indices = [];
+
+    positions.push(0, 0, 0);
+    normals.push(0, 1, 0);
+    texCoords.push(0.5, 0.5);
+
+    for (let i = 0; i <= segments; i++) {
+        const angle = (i / segments) * Math.PI * 2;
+        const x = Math.cos(angle) * radius;
+        const z = Math.sin(angle) * radius;
+        positions.push(x, 0, z);
+        normals.push(0, 1, 0);
+        texCoords.push(0.5 + x / (2 * radius), 0.5 + z / (2 * radius));
+    }
+
+    for (let i = 1; i <= segments; i++) {
+        indices.push(0, i, i + 1);
+    }
+
+    return { positions, normals, texCoords, indices };
+}
+
 function createProgram(gl, vertexShader, fragmentShader) {
     const program = gl.createProgram();
     gl.attachShader(program, vertexShader);

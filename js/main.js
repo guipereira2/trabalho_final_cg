@@ -15,13 +15,16 @@ let sphereBuffers;
 let cubeBuffers;
 let planeBuffers;
 let cylinderBuffers;
+let discBuffers; 
 
+canvas = document.getElementById('glCanvas');
+gl = canvas.getContext('webgl', { alpha: true }); // importante
 let grassTexture;
 let woodTexture;
 
 let obstacles = [];
 let holePosition = vec3.fromValues(0, 0, 10);
-let holeRadius = 0.5;
+let holeRadius = 0.7;
 
 let lastTime = 0;
 let isDragging = false;
@@ -30,7 +33,7 @@ let mouseX = 0, mouseY = 0;
 // Inicializar
 async function init() {
     canvas = document.getElementById('glCanvas');
-    gl = canvas.getContext('webgl');
+    gl = canvas.getContext('webgl', { alpha: true }); 
     
     if (!gl) {
         alert('WebGL não suportado!');
@@ -46,7 +49,6 @@ async function init() {
     physics = new Physics();
     ball = new GolfBall();
     flag = new Flag(holePosition);
-    dog = new Dog(vec3.fromValues(-5, 0, 5));
     hud = new HUD();
     
     // Criar geometrias (agora ball já existe)
@@ -67,9 +69,11 @@ async function init() {
     
     // Configurar WebGL
     gl.enable(gl.DEPTH_TEST);
-    gl.enable(gl.CULL_FACE);
-    gl.clearColor(0.53, 0.81, 0.92, 1.0);
-    
+    //gl.enable(gl.CULL_FACE);
+
+    // Fundo transparente: deixa o fundo.png do body aparecer
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
+
     // Iniciar loop
     requestAnimationFrame(gameLoop);
 }
@@ -103,7 +107,7 @@ function createGeometries() {
     };
     
     // Plano (chão)
-    const plane = createPlane(50, 50);
+    const plane = createPlane(90, 90);
     planeBuffers = {
         position: createBuffer(gl, plane.positions),
         normal: createBuffer(gl, plane.normals),
@@ -218,40 +222,36 @@ function createProceduralTexture(gl, width, height, colorFunc) {
 }
 
 function createObstacles() {
-    // Paredes laterais
+    const fieldSize = 40; // campo 40x40 (antes era 25x25)
+    const wallHeight = 3;
+    const wallThickness = 1;
+    
+    // Parede esquerda
     obstacles.push({
         type: 'wall',
-        min: vec3.fromValues(-25, 0, -25),
-        max: vec3.fromValues(-24, 2, 25)
-    });
-    obstacles.push({
-        type: 'wall',
-        min: vec3.fromValues(24, 0, -25),
-        max: vec3.fromValues(25, 2, 25)
-    });
-    obstacles.push({
-        type: 'wall',
-        min: vec3.fromValues(-25, 0, -25),
-        max: vec3.fromValues(25, 2, -24)
-    });
-    obstacles.push({
-        type: 'wall',
-        min: vec3.fromValues(-25, 0, 24),
-        max: vec3.fromValues(25, 2, 25)
+        min: vec3.fromValues(-fieldSize, 0, -fieldSize),
+        max: vec3.fromValues(-fieldSize + wallThickness, wallHeight, fieldSize)
     });
     
-    // Parede central
+    // Parede direita
     obstacles.push({
         type: 'wall',
-        min: vec3.fromValues(-3, 0, 0),
-        max: vec3.fromValues(3, 1.5, 0.5)
+        min: vec3.fromValues(fieldSize - wallThickness, 0, -fieldSize),
+        max: vec3.fromValues(fieldSize, wallHeight, fieldSize)
     });
     
-    // Rampa
+    // Parede frente
     obstacles.push({
-        type: 'ramp',
-        min: vec3.fromValues(-5, 0, 3),
-        max: vec3.fromValues(5, 1, 6)
+        type: 'wall',
+        min: vec3.fromValues(-fieldSize, 0, -fieldSize),
+        max: vec3.fromValues(fieldSize, wallHeight, -fieldSize + wallThickness)
+    });
+    
+    // Parede fundo
+    obstacles.push({
+        type: 'wall',
+        min: vec3.fromValues(-fieldSize, 0, fieldSize - wallThickness),
+        max: vec3.fromValues(fieldSize, wallHeight, fieldSize)
     });
 }
 
@@ -356,7 +356,6 @@ function update(deltaTime) {
     // Atualizar objetos
     physics.updateBall(ball, obstacles, deltaTime);
     flag.update(deltaTime);
-    dog.update(deltaTime);
     
     // Verificar colisão com o buraco
     if (physics.checkHoleCollision(ball, holePosition, holeRadius)) {
@@ -386,16 +385,13 @@ function render() {
     
     // Renderizar cena
     renderGround();
-    renderWalls();
-    renderRamp();
+     renderWalls();
     renderHole();
     renderBall();
     renderFlag();
-    renderDog();
     
     // Renderizar seta de mira
     if (!ball.isMoving && ball.charging && ball.aimPower > 0) {
-        renderAimArrow();
         renderAimLine();
     }
 }
@@ -461,12 +457,42 @@ function renderRamp() {
     });
 }
 
+
 function renderHole() {
-    const modelMatrix = mat4.create();
-    mat4.translate(modelMatrix, modelMatrix, holePosition);
-    mat4.scale(modelMatrix, modelMatrix, [holeRadius, 0.1, holeRadius]);
-    drawMesh(cylinderBuffers, modelMatrix, null, false, [0.1, 0.1, 0.1]);
+    const holeDepth = 0.5;
+
+    // Copinho escuro (cilindro afundado)
+    let modelMatrix = mat4.create();
+    mat4.translate(modelMatrix, modelMatrix, [
+        holePosition[0],
+        -holeDepth * 3,   // centro abaixo da grama
+        holePosition[2]
+    ]);
+    mat4.scale(modelMatrix, modelMatrix, [
+        holeRadius * 0.9,
+        holeDepth,
+        holeRadius * 0.9
+    ]);
+    drawMesh(cylinderBuffers, modelMatrix, null, false, [0.05, 0.04, 0.04]);
+
+    // Borda do copo (anel claro no nível da grama)
+    modelMatrix = mat4.create();
+    mat4.translate(modelMatrix, modelMatrix, [
+        holePosition[0],
+        0.01,               // colado na grama
+        holePosition[2]
+    ]);
+    mat4.scale(modelMatrix, modelMatrix, [
+        holeRadius * 1.02,
+        0.03,
+        holeRadius * 1.02
+    ]);
+    // cor clara (plástico/metal)
+    drawMesh(cylinderBuffers, modelMatrix, null, false, [0.9, 0.9, 0.9]);
 }
+
+
+
 
 function renderBall() {
     const modelMatrix = ball.getModelMatrix();
@@ -523,7 +549,8 @@ function renderAimLine() {
     for (let i = 0; i < segments; i++) {
         const modelMatrix = mat4.create();
         mat4.translate(modelMatrix, modelMatrix, ball.position);
-        mat4.rotateY(modelMatrix, modelMatrix, -ball.aimAngle);
+        mat4.rotateY(modelMatrix, modelMatrix, ball.aimAngle);
+
         mat4.translate(modelMatrix, modelMatrix, [0, 0.05, segmentLength * (i + 0.5)]);
         mat4.scale(modelMatrix, modelMatrix, [0.1, 0.1, segmentLength * 0.3]);
         

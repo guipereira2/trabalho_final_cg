@@ -35,14 +35,23 @@ class Camera {
     }
     
     setFreeView(ballPos) {
-        const radius = 15;
-        this.position[0] = ballPos[0] + radius * Math.cos(this.freeRotationY) * Math.cos(this.freeRotationX);
-        this.position[1] = ballPos[1] + radius * Math.sin(this.freeRotationX);
-        this.position[2] = ballPos[2] + radius * Math.sin(this.freeRotationY) * Math.cos(this.freeRotationX);
-        
-        this.target = vec3.clone(ballPos);
-        this.updateViewMatrix();
+    const radius = 15;
+
+    // Calcula posição com base nos ângulos livres
+    this.position[0] = ballPos[0] + radius * Math.cos(this.freeRotationY) * Math.cos(this.freeRotationX);
+    this.position[1] = ballPos[1] + radius * Math.sin(this.freeRotationX);
+    this.position[2] = ballPos[2] + radius * Math.sin(this.freeRotationY) * Math.cos(this.freeRotationX);
+
+    // Impede a câmera de entrar no chão (y muito baixo)
+    const minY = 1.0; // altura mínima da câmera
+    if (this.position[1] < minY) {
+        this.position[1] = minY;
     }
+
+    this.target = vec3.clone(ballPos);
+    this.updateViewMatrix();
+}
+
     
     switchMode() {
         this.currentMode = (this.currentMode + 1) % 3;
@@ -52,29 +61,34 @@ class Camera {
     }
     
     rotateFree(dx, dy) {
-        this.freeRotationY += dx * 0.01;
-        this.freeRotationX += dy * 0.01;
-        this.freeRotationX = Math.max(-Math.PI/2 + 0.1, Math.min(Math.PI/2 - 0.1, this.freeRotationX));
-    }
-    
+    // Atualiza ângulos com base no movimento do mouse
+    this.freeRotationY += dx * 0.005;   // gira em torno da bola (horizontal)
+    this.freeRotationX += dy * 0.005;   // sobe/desce
+
+    // Limita o ângulo vertical para não passar por baixo nem virar demais
+    const minPitch = -Math.PI / 3;  // -60°
+    const maxPitch =  Math.PI / 3;  //  60°
+    this.freeRotationX = Math.max(minPitch, Math.min(maxPitch, this.freeRotationX));
+}
+
     updateProjection(width, height) {
         const aspect = width / height;
         mat4.perspective(this.projectionMatrix, Math.PI / 4, aspect, 0.1, 1000);
     }
     
     update(ballPos, aimDirection) {
-        switch(this.currentMode) {
-            case 0:
-                this.setAerialView(ballPos);
-                break;
-            case 1:
-                this.setBehindBallView(ballPos, aimDirection);
-                break;
-            case 2:
-                this.setFreeView(ballPos);
-                break;
-        }
+    switch (this.currentMode) {
+        case 0:
+            this.setAerialView(ballPos);
+            break;
+        case 1:
+            this.setBehindBallView(ballPos, aimDirection);
+            break;
+        case 2:
+            this.setFreeView(ballPos);
+            break;
     }
+}
     
     getPosition() {
         return this.position;
